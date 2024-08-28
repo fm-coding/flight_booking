@@ -21,8 +21,8 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // Updated csrf configuration
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/airports/**").hasRole("ADMIN")
-                        .requestMatchers("/api/airports").permitAll()
+                        .requestMatchers("/api/airports/**", "/api/airplanes/**").hasRole("ADMIN")
+                        .requestMatchers("/api/airports", "/api/airplanes").permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic();
