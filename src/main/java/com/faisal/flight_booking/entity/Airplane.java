@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Data
@@ -25,6 +26,7 @@ public class Airplane {
     @Column(nullable = false)
     private String manufacturer;
 
+    @Getter
     @NotNull(message = "Capacity cannot be null")
     @Column(nullable = false)
     private Integer capacity;
@@ -33,4 +35,9 @@ public class Airplane {
     @JoinColumn(name = "airport_id", nullable = false)
     @NotNull(message = "Airport cannot be null")
     private Airport airport;
+
+    // Getter method for seat count
+    public Integer getSeatCount() {
+        return capacity;
+    }
 }
