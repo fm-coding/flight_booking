@@ -43,11 +43,4 @@ public class Flight {
     @NotBlank(message = "Arrival time cannot be blank")
     @Column(nullable = false)
     private String arrivalTime;
-
-    @Column(nullable = false)
-    private Integer availableSeats;
-
-    @NotNull(message = "Price cannot be null")
-    @Column(nullable = false)
-    private Double price;
 }

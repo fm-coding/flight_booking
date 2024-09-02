@@ -3,6 +3,8 @@ package com.faisal.flight_booking.controller;
 import com.faisal.flight_booking.entity.Flight;
 import com.faisal.flight_booking.service.FlightService;
 import jakarta.validation.Valid;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -74,12 +76,11 @@ public class FlightController {
     public ResponseEntity<ResponseMessage> createFlightsAutomated(@Valid @RequestBody AutomatedFlightRequest request) {
         try {
             List<Flight> createdFlights = flightService.createFlightsAutomated(
+                    request.getAirplaneId(),
                     request.getDepartureAirportId(),
                     request.getArrivalAirportId(),
-                    request.getAirplaneId(),
                     request.getDepartureTime(),
-                    request.getArrivalTime(),
-                    request.getPrice()
+                    request.getArrivalTime()
             );
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(new ResponseMessage("Flights created successfully.", createdFlights));
@@ -89,9 +90,20 @@ public class FlightController {
         }
     }
 
-    // Response message class
+    @GetMapping("/flightNumber/{flightNumber}")
+    public ResponseEntity<ResponseMessage> getFlightByFlightNumber(@PathVariable String flightNumber) {
+        try {
+            Flight flight = flightService.getFlightByFlightNumber(flightNumber);
+            return ResponseEntity.ok(new ResponseMessage("Flight found.", flight));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ResponseMessage("Flight not found with flight number " + flightNumber));
+        }
+    }
+
+    @Getter
     public static class ResponseMessage {
-        private String message;
+        private final String message;
         private Object data;
 
         public ResponseMessage(String message) {
@@ -102,81 +114,15 @@ public class FlightController {
             this.message = message;
             this.data = data;
         }
-
-        // Getters and setters
-        public String getMessage() {
-            return message;
-        }
-
-        public void setMessage(String message) {
-            this.message = message;
-        }
-
-        public Object getData() {
-            return data;
-        }
-
-        public void setData(Object data) {
-            this.data = data;
-        }
     }
 
-    // Request body class for automated flight creation
+    @Setter
+    @Getter
     public static class AutomatedFlightRequest {
+        private Long airplaneId;
         private Long departureAirportId;
         private Long arrivalAirportId;
-        private Long airplaneId;
         private String departureTime;
         private String arrivalTime;
-        private Double price;
-
-        // Getters and setters
-        public Long getDepartureAirportId() {
-            return departureAirportId;
-        }
-
-        public void setDepartureAirportId(Long departureAirportId) {
-            this.departureAirportId = departureAirportId;
-        }
-
-        public Long getArrivalAirportId() {
-            return arrivalAirportId;
-        }
-
-        public void setArrivalAirportId(Long arrivalAirportId) {
-            this.arrivalAirportId = arrivalAirportId;
-        }
-
-        public Long getAirplaneId() {
-            return airplaneId;
-        }
-
-        public void setAirplaneId(Long airplaneId) {
-            this.airplaneId = airplaneId;
-        }
-
-        public String getDepartureTime() {
-            return departureTime;
-        }
-
-        public void setDepartureTime(String departureTime) {
-            this.departureTime = departureTime;
-        }
-
-        public String getArrivalTime() {
-            return arrivalTime;
-        }
-
-        public void setArrivalTime(String arrivalTime) {
-            this.arrivalTime = arrivalTime;
-        }
-
-        public Double getPrice() {
-            return price;
-        }
-
-        public void setPrice(Double price) {
-            this.price = price;
-        }
     }
 }

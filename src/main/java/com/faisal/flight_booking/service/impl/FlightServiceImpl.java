@@ -60,7 +60,7 @@ public class FlightServiceImpl implements FlightService {
     }
 
     @Override
-    public List<Flight> createFlightsAutomated(Long airplaneId, Long departureAirportId, Long arrivalAirportId, String departureTime, String arrivalTime, Double price) {
+    public List<Flight> createFlightsAutomated(Long airplaneId, Long departureAirportId, Long arrivalAirportId, String departureTime, String arrivalTime) {
         Airplane airplane = airplaneRepository.findById(airplaneId)
                 .orElseThrow(() -> new RuntimeException("Airplane not found with id " + airplaneId));
         Airport departureAirport = airportRepository.findById(departureAirportId)
@@ -68,24 +68,44 @@ public class FlightServiceImpl implements FlightService {
         Airport arrivalAirport = airportRepository.findById(arrivalAirportId)
                 .orElseThrow(() -> new RuntimeException("Arrival airport not found with id " + arrivalAirportId));
 
-        int totalSeats = airplane.getCapacity(); // Total seat capacity of the airplane
-        List<Flight> flights = new ArrayList<>();
-
-        for (int i = 0; i < totalSeats; i++) {
-            Flight flight = new Flight();
-            flight.setFlightNumber("FL" + (i + 1000)); // Example flight number generation
-            flight.setDepartureAirport(departureAirport);
-            flight.setArrivalAirport(arrivalAirport);
-            flight.setAirplane(airplane);
-            flight.setDepartureTime(departureTime);
-            flight.setArrivalTime(arrivalTime);
-            flight.setAvailableSeats(1); // Each flight represents a single seat
-            flight.setPrice(price);
-
-            flights.add(flight);
+        // Ensure the airplane is at the correct departure airport
+        if (!airplane.getAirport().equals(departureAirport)) {
+            throw new RuntimeException("Airplane with ID " + airplaneId + " is not situated at the departure airport with ID " + departureAirportId);
         }
+
+        // Generate a unique flight number based on departure and arrival information
+        String uniqueFlightNumber = generateUniqueFlightNumber(departureAirport, arrivalAirport, departureTime);
+
+        // Check if a flight with the generated number already exists
+        boolean exists = flightRepository.existsByFlightNumberAndDepartureTimeAndDepartureAirport_Id(
+                uniqueFlightNumber, departureTime, departureAirportId);
+
+        if (exists) {
+            throw new RuntimeException("Flight with number " + uniqueFlightNumber + " already exists for the given departure time and airport.");
+        }
+
+        Flight flight = new Flight();
+        flight.setFlightNumber(uniqueFlightNumber);
+        flight.setDepartureAirport(departureAirport);
+        flight.setArrivalAirport(arrivalAirport);
+        flight.setAirplane(airplane);
+        flight.setDepartureTime(departureTime);
+        flight.setArrivalTime(arrivalTime);
+
+        List<Flight> flights = new ArrayList<>();
+        flights.add(flight);
 
         return flightRepository.saveAll(flights);
     }
 
+    private String generateUniqueFlightNumber(Airport departureAirport, Airport arrivalAirport, String departureTime) {
+        return "FL" + departureAirport.getCode() + arrivalAirport.getCode() + departureTime.replaceAll("[-:T]", "");
+    }
+
+
+    @Override
+    public Flight getFlightByFlightNumber(String flightNumber) {
+        return flightRepository.findByFlightNumber(flightNumber)
+                .orElseThrow(() -> new RuntimeException("Flight not found with flight number " + flightNumber));
+    }
 }

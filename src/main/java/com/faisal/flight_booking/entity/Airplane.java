@@ -36,8 +36,4 @@ public class Airplane {
     @NotNull(message = "Airport cannot be null")
     private Airport airport;
 
-    // Getter method for seat count
-    public Integer getSeatCount() {
-        return capacity;
-    }
 }
