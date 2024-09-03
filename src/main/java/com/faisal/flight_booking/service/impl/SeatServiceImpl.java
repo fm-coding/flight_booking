@@ -3,6 +3,7 @@ package com.faisal.flight_booking.service.impl;
 import com.faisal.flight_booking.entity.Seat;
 import com.faisal.flight_booking.entity.SeatClass;
 import com.faisal.flight_booking.entity.Airplane;
+import com.faisal.flight_booking.exception.AirplaneNotFoundException;
 import com.faisal.flight_booking.repository.SeatClassRepository;
 import com.faisal.flight_booking.repository.SeatRepository;
 import com.faisal.flight_booking.repository.AirplaneRepository;
@@ -32,7 +33,12 @@ public class SeatServiceImpl implements SeatService {
     @Transactional
     public List<Seat> initializeSeatClassesAndSeats(Long airplaneId) {
         Airplane airplane = airplaneRepository.findById(airplaneId)
-                .orElseThrow(() -> new RuntimeException("Airplane not found with id " + airplaneId));
+                .orElseThrow(() -> new AirplaneNotFoundException("Airplane not found with id " + airplaneId));
+
+        // Check if seats have already been initialized for this airplane
+        if (!seatRepository.findByAirplaneId(airplaneId).isEmpty()) {
+            throw new RuntimeException("Seats have already been initialized for this airplane.");
+        }
 
         // Check if seat classes already exist
         SeatClass firstClass = seatClassRepository.findById(1L).orElse(new SeatClass(1L, "First", airplane));

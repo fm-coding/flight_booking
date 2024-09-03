@@ -1,7 +1,7 @@
 package com.faisal.flight_booking.controller;
 
 import com.faisal.flight_booking.entity.Seat;
-import com.faisal.flight_booking.entity.SeatClass;
+import com.faisal.flight_booking.exception.AirplaneNotFoundException;
 import com.faisal.flight_booking.service.SeatService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,12 +19,6 @@ public class SeatController {
         this.seatService = seatService;
     }
 
-    @GetMapping("/classes/{airplaneId}")
-    public ResponseEntity<List<SeatClass>> getSeatClasses(@PathVariable Long airplaneId) {
-        List<SeatClass> seatClasses = seatService.getSeatClassesByAirplaneId(airplaneId);
-        return ResponseEntity.ok(seatClasses);
-    }
-
     @GetMapping("/{airplaneId}")
     public ResponseEntity<List<Seat>> getSeats(@PathVariable Long airplaneId) {
         List<Seat> seats = seatService.getSeatsByAirplaneId(airplaneId);
@@ -32,8 +26,14 @@ public class SeatController {
     }
 
     @PostMapping("/initialize/{airplaneId}")
-    public ResponseEntity<List<Seat>> initializeSeats(@PathVariable Long airplaneId) {
-        List<Seat> initializedSeats = seatService.initializeSeatClassesAndSeats(airplaneId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(initializedSeats);
+    public ResponseEntity<?> initializeSeats(@PathVariable Long airplaneId) {
+        try {
+            List<Seat> initializedSeats = seatService.initializeSeatClassesAndSeats(airplaneId);
+            return ResponseEntity.status(HttpStatus.CREATED).body(initializedSeats);
+        } catch (AirplaneNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
     }
 }
