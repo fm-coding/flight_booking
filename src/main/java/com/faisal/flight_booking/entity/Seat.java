@@ -1,13 +1,21 @@
 package com.faisal.flight_booking.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
+@Setter
+@Getter
 @Entity
 public class Seat {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String seatNumber;
+
+    private boolean isTaken;
 
     @ManyToOne
     @JoinColumn(name = "seat_class_id")
@@ -17,45 +25,15 @@ public class Seat {
     @JoinColumn(name = "airplane_id")
     private Airplane airplane;
 
-    public Seat() {
-    }
+    @ManyToOne
+    @JoinColumn(name = "flight_id")
+    private Flight flight;
+
+    public Seat() {}
 
     public Seat(String seatNumber, SeatClass seatClass, Airplane airplane) {
         this.seatNumber = seatNumber;
         this.seatClass = seatClass;
-        this.airplane = airplane;
-    }
-
-    // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getSeatNumber() {
-        return seatNumber;
-    }
-
-    public void setSeatNumber(String seatNumber) {
-        this.seatNumber = seatNumber;
-    }
-
-    public SeatClass getSeatClass() {
-        return seatClass;
-    }
-
-    public void setSeatClass(SeatClass seatClass) {
-        this.seatClass = seatClass;
-    }
-
-    public Airplane getAirplane() {
-        return airplane;
-    }
-
-    public void setAirplane(Airplane airplane) {
         this.airplane = airplane;
     }
 }

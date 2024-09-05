@@ -101,6 +101,18 @@ public class FlightController {
         }
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<ResponseMessage> searchFlightsByCities(
+            @RequestParam String departureCity,
+            @RequestParam String arrivalCity) {
+        List<Flight> flights = flightService.searchFlightsByCities(departureCity, arrivalCity);
+        if (flights.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ResponseMessage("No flights found from " + departureCity + " to " + arrivalCity));
+        }
+        return ResponseEntity.ok(new ResponseMessage("Flights found.", flights));
+    }
+
     @Getter
     public static class ResponseMessage {
         private final String message;

@@ -19,10 +19,14 @@ public class SeatController {
         this.seatService = seatService;
     }
 
-    @GetMapping("/{airplaneId}")
-    public ResponseEntity<List<Seat>> getSeats(@PathVariable Long airplaneId) {
-        List<Seat> seats = seatService.getSeatsByAirplaneId(airplaneId);
-        return ResponseEntity.ok(seats);
+    @GetMapping("/flight/{flightId}")
+    public ResponseEntity<List<Seat>> getSeatsByFlightId(@PathVariable Long flightId) {
+        try {
+            List<Seat> seats = seatService.getSeatsByFlightId(flightId);
+            return ResponseEntity.ok(seats);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
 
     @PostMapping("/initialize/{airplaneId}")

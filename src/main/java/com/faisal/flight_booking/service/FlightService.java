@@ -19,4 +19,9 @@ public interface FlightService {
     List<Flight> createFlightsAutomated(Long airplaneId, Long departureAirportId, Long arrivalAirportId, String departureTime, String arrivalTime);
 
     Flight getFlightByFlightNumber(String flightNumber);
+
+    List<Flight> searchFlightsByCities(String departureCity, String arrivalCity);
+
+
+
 }

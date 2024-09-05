@@ -13,4 +13,6 @@ public interface SeatService {
     void addSeatClassesForAirplane(Long airplaneId);
 
     List<SeatClass> getSeatClasses(Long airplaneId);
+
+    List<Seat> getSeatsByFlightId(Long flightId);
 }

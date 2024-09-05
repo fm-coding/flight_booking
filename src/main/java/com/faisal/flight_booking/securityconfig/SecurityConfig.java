@@ -23,6 +23,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/airports/**", "/api/airplanes/**").hasRole("ADMIN")
                         .requestMatchers("/api/airports", "/api/airplanes").permitAll()
+                        .requestMatchers("/api/flights/search").permitAll() // Allow access to flight search without authentication
                         .anyRequest().authenticated()
                 )
                 .httpBasic();

@@ -1,9 +1,11 @@
 package com.faisal.flight_booking.service.impl;
 
+import com.faisal.flight_booking.entity.Flight;
 import com.faisal.flight_booking.entity.Seat;
 import com.faisal.flight_booking.entity.SeatClass;
 import com.faisal.flight_booking.entity.Airplane;
 import com.faisal.flight_booking.exception.AirplaneNotFoundException;
+import com.faisal.flight_booking.repository.FlightRepository;
 import com.faisal.flight_booking.repository.SeatClassRepository;
 import com.faisal.flight_booking.repository.SeatRepository;
 import com.faisal.flight_booking.repository.AirplaneRepository;
@@ -21,12 +23,14 @@ public class SeatServiceImpl implements SeatService {
     private final SeatRepository seatRepository;
     private final SeatClassRepository seatClassRepository;
     private final AirplaneRepository airplaneRepository;
+    private final FlightRepository flightRepository;
 
     @Autowired
-    public SeatServiceImpl(SeatRepository seatRepository, SeatClassRepository seatClassRepository, AirplaneRepository airplaneRepository) {
+    public SeatServiceImpl(SeatRepository seatRepository, SeatClassRepository seatClassRepository, AirplaneRepository airplaneRepository, FlightRepository flightRepository) {
         this.seatRepository = seatRepository;
         this.seatClassRepository = seatClassRepository;
         this.airplaneRepository = airplaneRepository;
+        this.flightRepository = flightRepository;
     }
 
     @Override
@@ -94,5 +98,17 @@ public class SeatServiceImpl implements SeatService {
     @Override
     public List<SeatClass> getSeatClasses(Long airplaneId) {
         return seatClassRepository.findByAirplaneId(airplaneId);
+    }
+
+    @Override
+    public List<Seat> getSeatsByFlightId(Long flightId) {
+        Flight flight = flightRepository.findById(flightId)
+                .orElseThrow(() -> new RuntimeException("Flight not found with ID " + flightId));
+
+        // Retrieve the airplane from the flight
+        Airplane airplane = flight.getAirplane();
+
+        // Return the seats associated with the airplane
+        return seatRepository.findByAirplaneId(airplane.getId());
     }
 }

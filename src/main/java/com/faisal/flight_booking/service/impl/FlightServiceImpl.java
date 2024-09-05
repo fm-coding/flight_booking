@@ -102,10 +102,14 @@ public class FlightServiceImpl implements FlightService {
         return "FL" + departureAirport.getCode() + arrivalAirport.getCode() + departureTime.replaceAll("[-:T]", "");
     }
 
-
     @Override
     public Flight getFlightByFlightNumber(String flightNumber) {
         return flightRepository.findByFlightNumber(flightNumber)
                 .orElseThrow(() -> new RuntimeException("Flight not found with flight number " + flightNumber));
+    }
+
+    @Override
+    public List<Flight> searchFlightsByCities(String departureCity, String arrivalCity) {
+        return flightRepository.findFlightsByDepartureCityAndArrivalCity(departureCity, arrivalCity);
     }
 }
